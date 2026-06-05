@@ -115,7 +115,7 @@
 @utility hairline {
   position: relative;
 }
-@utility hairline::after {
+.hairline::after {
   content: "";
   display: block;
   width: 48px;
