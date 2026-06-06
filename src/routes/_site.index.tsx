@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Heart, Award, Users, Star, ArrowRight, Check } from "lucide-react";
 import { SectionHeading } from "@/components/SectionHeading";
 import { QuoteForm } from "@/components/QuoteForm";
 import { images, services, packages, stats, testimonials, portfolio } from "@/lib/site-data";
+import { getHero, getServices, getPackages, getGallery, getTestimonials } from "@/lib/db";
 
 export const Route = createFileRoute("/_site/")({
   head: () => ({
@@ -19,13 +21,72 @@ export const Route = createFileRoute("/_site/")({
 });
 
 function HomePage() {
+  const [hero, setHero] = useState({
+    headline: "Creating Unforgettable Celebrations",
+    tagline: "From intimate family gatherings to grand destination weddings, we bring your dream events to life — with elegance, soul, and flawless detail.",
+    imageUrl: images.heroWedding,
+  });
+  const [servicesData, setServicesData] = useState(services);
+  const [packagesData, setPackagesData] = useState(packages);
+  const [portfolioData, setPortfolioData] = useState(portfolio);
+  const [testimonialsData, setTestimonialsData] = useState(testimonials);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dbHero = await getHero();
+        if (dbHero) {
+          setHero({
+            headline: dbHero.headline,
+            tagline: dbHero.tagline,
+            imageUrl: dbHero.imageUrl || images.heroWedding,
+          });
+        }
+
+        const dbServices = await getServices();
+        if (dbServices.length > 0) {
+          setServicesData(
+            dbServices.map((s) => ({
+              ...s,
+              image: s.image || (services.find((ds) => ds.slug === s.slug)?.image || images.heroWedding),
+            }))
+          );
+        }
+
+        const dbPackages = await getPackages();
+        if (dbPackages.length > 0) {
+          setPackagesData(dbPackages);
+        }
+
+        const dbGallery = await getGallery();
+        if (dbGallery.length > 0) {
+          setPortfolioData(
+            dbGallery.map((g, i) => ({
+              src: g.src || (portfolio[i % portfolio.length]?.src || images.heroWedding),
+              title: g.title,
+              category: g.category,
+            }))
+          );
+        }
+
+        const dbTestimonials = await getTestimonials();
+        if (dbTestimonials.length > 0) {
+          setTestimonialsData(dbTestimonials);
+        }
+      } catch (e) {
+        console.error("Failed to load firestore data, using static defaults:", e);
+      }
+    }
+    loadData();
+  }, []);
+
   return (
     <>
       {/* HERO */}
       <section className="relative min-h-[88vh] -mt-20 flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={images.heroWedding}
+            src={hero.imageUrl}
             alt="Indian destination wedding mandap"
             className="h-full w-full object-cover animate-slow-zoom"
             width={1920}
@@ -39,11 +100,12 @@ function HomePage() {
           <div className="max-w-2xl text-primary-foreground animate-float-up">
             <p className="text-xs uppercase tracking-[0.4em] text-gold mb-5">Est. 2012 · India</p>
             <h1 className="font-display text-5xl md:text-7xl leading-[1.05] text-white">
-              Creating <em className="not-italic text-gold-gradient">Unforgettable</em> Celebrations
+              {hero.headline.split(" ").map((w, idx, arr) => 
+                idx === arr.length - 2 ? <span key={idx}><em className="not-italic text-gold-gradient">{w} </em></span> : w + " "
+              )}
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl">
-              From intimate family gatherings to grand destination weddings,
-              we bring your dream events to life — with elegance, soul, and flawless detail.
+              {hero.tagline}
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
@@ -62,7 +124,7 @@ function HomePage() {
 
             <div className="mt-12 flex items-center gap-6 text-white/80">
               <div className="flex -space-x-2">
-                {[1,2,3,4].map((i) => (
+                {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="h-9 w-9 rounded-full border-2 border-white bg-gradient-to-br from-blush to-gold" />
                 ))}
               </div>
@@ -118,7 +180,7 @@ function HomePage() {
         <div className="mx-auto max-w-7xl px-5 lg:px-8 py-20 md:py-28">
           <SectionHeading eyebrow="Our Services" title="A celebration for every milestone" />
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {services.slice(0, 8).map((s) => (
+            {servicesData.slice(0, 8).map((s) => (
               <Link
                 key={s.slug}
                 to="/services"
@@ -151,7 +213,7 @@ function HomePage() {
           description="Transparent pricing. Fully customizable. Pick a starting point and we'll tailor every detail."
         />
         <div className="mt-14 grid md:grid-cols-3 gap-6">
-          {packages.map((p) => (
+          {packagesData.map((p) => (
             <div
               key={p.name}
               className={`relative rounded-3xl p-8 shadow-soft hover:shadow-luxe transition flex flex-col ${
@@ -200,7 +262,7 @@ function HomePage() {
         <div className="mx-auto max-w-7xl px-5 lg:px-8 py-20 md:py-28">
           <SectionHeading eyebrow="Previous Events" title="A glimpse into our world" />
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {portfolio.map((p, i) => (
+            {portfolioData.map((p, i) => (
               <div
                 key={p.title}
                 className={`relative overflow-hidden rounded-2xl group ${
@@ -228,7 +290,7 @@ function HomePage() {
       <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20 md:py-28">
         <SectionHeading eyebrow="Kind Words" title="Loved by families across India" />
         <div className="mt-14 grid md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
+          {testimonialsData.map((t) => (
             <figure key={t.name} className="rounded-2xl bg-card border border-border p-7 shadow-soft">
               <div className="flex text-gold mb-4">
                 {[...Array(t.rating)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}

@@ -32,10 +32,10 @@ export function SiteLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header
-        className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
+        className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 bg-background/95 backdrop-blur-md border-b border-border/60 ${
           scrolled
-            ? "bg-background/85 backdrop-blur-md border-b border-border/60 py-3"
-            : "bg-transparent py-5"
+            ? "py-3"
+            : "py-5"
         }`}
       >
         <div className="mx-auto max-w-7xl px-5 lg:px-8 flex items-center justify-between">
@@ -186,7 +186,11 @@ export function SiteLayout() {
         <div className="border-t border-primary-foreground/10">
           <div className="mx-auto max-w-7xl px-5 lg:px-8 py-5 text-xs text-primary-foreground/60 flex flex-wrap items-center justify-between gap-2">
             <p>© {new Date().getFullYear()} Aura Events. All rights reserved.</p>
-            <p>Crafted with love across India.</p>
+            <div className="flex items-center gap-3">
+              <span>Crafted with love across India.</span>
+              <span className="text-primary-foreground/25">|</span>
+              <Link to="/admin" className="hover:text-gold transition">Staff Portal</Link>
+            </div>
           </div>
         </div>
       </footer>

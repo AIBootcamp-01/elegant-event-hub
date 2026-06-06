@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, X } from "lucide-react";
-import { packages } from "@/lib/site-data";
+import { packages as defaultPackages } from "@/lib/site-data";
 import { SectionHeading } from "@/components/SectionHeading";
+import { getPackages } from "@/lib/db";
 
 export const Route = createFileRoute("/_site/packages")({
   head: () => ({
@@ -27,6 +29,22 @@ const comparison = [
 ];
 
 export default function Packages() {
+  const [packagesData, setPackagesData] = useState(defaultPackages);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dbPackages = await getPackages();
+        if (dbPackages.length > 0) {
+          setPackagesData(dbPackages);
+        }
+      } catch (e) {
+        console.error("Failed to load packages from Firestore, using static defaults:", e);
+      }
+    }
+    loadData();
+  }, []);
+
   return (
     <>
       <section className="bg-blush-gradient">
@@ -40,7 +58,7 @@ export default function Packages() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20 grid md:grid-cols-3 gap-6">
-        {packages.map((p) => (
+        {packagesData.map((p) => (
           <div
             key={p.name}
             className={`relative rounded-3xl p-8 shadow-soft hover:shadow-luxe transition flex flex-col ${

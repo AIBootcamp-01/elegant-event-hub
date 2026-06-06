@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Star } from "lucide-react";
-import { testimonials, images } from "@/lib/site-data";
+import { testimonials as defaultTestimonials, images } from "@/lib/site-data";
+import { getTestimonials } from "@/lib/db";
 
 export const Route = createFileRoute("/_site/testimonials")({
   head: () => ({
@@ -14,14 +16,30 @@ export const Route = createFileRoute("/_site/testimonials")({
   component: Testimonials,
 });
 
-const extended = [
-  ...testimonials,
+const defaultExtended = [
+  ...defaultTestimonials,
   { name: "Sneha & Karan Iyer", event: "Sangeet · Jaipur", quote: "We danced till 3 AM. Everyone is still talking about the decor and the food.", rating: 5 },
   { name: "The Reddy Family", event: "Baby Shower · Hyderabad", quote: "So thoughtful with every detail — even our grandparents felt looked after.", rating: 5 },
   { name: "Vikram Singh", event: "50th Birthday · Delhi", quote: "Aura made my wife's surprise birthday a moment we'll never forget.", rating: 5 },
 ];
 
 function Testimonials() {
+  const [testimonialsData, setTestimonialsData] = useState(defaultExtended);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dbTestimonials = await getTestimonials();
+        if (dbTestimonials.length > 0) {
+          setTestimonialsData(dbTestimonials);
+        }
+      } catch (e) {
+        console.error("Failed to load testimonials from Firestore, using static defaults:", e);
+      }
+    }
+    loadData();
+  }, []);
+
   return (
     <>
       <section className="bg-blush-gradient">
@@ -36,7 +54,7 @@ function Testimonials() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {extended.map((t, i) => (
+        {testimonialsData.map((t, i) => (
           <figure key={t.name + i} className="rounded-2xl bg-card border border-border p-7 shadow-soft">
             <div className="flex text-gold mb-4">
               {[...Array(t.rating)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}

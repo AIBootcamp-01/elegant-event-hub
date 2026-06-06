@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SectionHeading } from "@/components/SectionHeading";
-import { services } from "@/lib/site-data";
+import { services as defaultServices, images } from "@/lib/site-data";
 import { Check, ArrowRight } from "lucide-react";
+import { getServices } from "@/lib/db";
 
 export const Route = createFileRoute("/_site/services")({
   head: () => ({
@@ -16,6 +18,30 @@ export const Route = createFileRoute("/_site/services")({
 });
 
 function Services() {
+  const [servicesData, setServicesData] = useState(defaultServices);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dbServices = await getServices();
+        if (dbServices.length > 0) {
+          setServicesData(
+            dbServices.map((s) => ({
+              slug: s.slug,
+              title: s.title,
+              image: s.image || (defaultServices.find((ds) => ds.slug === s.slug)?.image || images.heroWedding),
+              description: s.description,
+              features: s.features,
+            }))
+          );
+        }
+      } catch (e) {
+        console.error("Failed to load services details from Firestore, using static defaults:", e);
+      }
+    }
+    loadData();
+  }, []);
+
   return (
     <>
       <section className="bg-blush-gradient">
@@ -30,7 +56,7 @@ function Services() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20 md:py-24 space-y-20">
-        {services.map((s, i) => (
+        {servicesData.map((s, i) => (
           <article key={s.slug} className={`grid md:grid-cols-2 gap-10 md:gap-16 items-center ${i % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
             <div className="relative">
               <img src={s.image} alt={s.title} loading="lazy" className="rounded-3xl shadow-luxe aspect-[4/5] object-cover w-full" />

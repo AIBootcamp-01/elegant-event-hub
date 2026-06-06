@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { X } from "lucide-react";
-import { portfolio } from "@/lib/site-data";
+import { portfolio as defaultPortfolio, images } from "@/lib/site-data";
+import { getGallery } from "@/lib/db";
 
 export const Route = createFileRoute("/_site/portfolio")({
   head: () => ({
@@ -20,7 +21,29 @@ const categories = ["All", "Wedding", "Engagement", "Birthday", "Anniversary", "
 function Portfolio() {
   const [filter, setFilter] = useState("All");
   const [active, setActive] = useState<number | null>(null);
-  const items = filter === "All" ? portfolio : portfolio.filter((p) => p.category === filter);
+  const [portfolioData, setPortfolioData] = useState(defaultPortfolio);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dbGallery = await getGallery();
+        if (dbGallery.length > 0) {
+          setPortfolioData(
+            dbGallery.map((g, i) => ({
+              src: g.src || (defaultPortfolio[i % defaultPortfolio.length]?.src || images.heroWedding),
+              title: g.title,
+              category: g.category,
+            }))
+          );
+        }
+      } catch (e) {
+        console.error("Failed to load gallery from Firestore, using static defaults:", e);
+      }
+    }
+    loadData();
+  }, []);
+
+  const items = filter === "All" ? portfolioData : portfolioData.filter((p) => p.category === filter);
 
   return (
     <>
@@ -53,7 +76,7 @@ function Portfolio() {
             <button
               key={p.title + i}
               onClick={() => setActive(i)}
-              className="group relative overflow-hidden rounded-2xl aspect-[4/5] text-left"
+              className="group relative overflow-hidden rounded-2xl aspect-[4/5] text-left cursor-pointer"
             >
               <img src={p.src} alt={p.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/10 to-transparent opacity-70 group-hover:opacity-100 transition" />
@@ -69,7 +92,7 @@ function Portfolio() {
       {active !== null && (
         <div
           onClick={() => setActive(null)}
-          className="fixed inset-0 z-[60] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-5 animate-float-up"
+          className="fixed inset-0 z-[60] bg-primary/90 backdrop-blur-sm flex items-center justify-center p-5 animate-float-up cursor-pointer"
         >
           <button className="absolute top-5 right-5 text-white p-2" onClick={() => setActive(null)}>
             <X className="h-6 w-6" />
