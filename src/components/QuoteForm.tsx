@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Check } from "lucide-react";
 import { addDBInquiry } from "@/lib/db";
+import { toast } from "sonner";
 
 const phoneRegex = /^[+]?[0-9\s-]{10,15}$/;
 
@@ -60,11 +61,12 @@ export function QuoteForm({ compact = false }: { compact?: boolean }) {
         budget: data.budget || "",
         message: data.message || "",
       });
+      toast.success("Inquiry submitted successfully!");
+      setDone(true);
     } catch (err) {
       console.error("Failed to save inquiry to Firestore:", err);
+      toast.error("Failed to submit inquiry. Please try again.");
     }
-
-    setDone(true);
   };
 
   if (done) {

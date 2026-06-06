@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "public": "dist/client",
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

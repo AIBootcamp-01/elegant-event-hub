@@ -16,6 +16,7 @@ import { Route as SiteTestimonialsRouteImport } from './routes/_site.testimonial
 import { Route as SiteServicesRouteImport } from './routes/_site.services'
 import { Route as SitePortfolioRouteImport } from './routes/_site.portfolio'
 import { Route as SitePackagesRouteImport } from './routes/_site.packages'
+import { Route as SiteLoginRouteImport } from './routes/_site.login'
 import { Route as SiteContactRouteImport } from './routes/_site.contact'
 import { Route as SiteAboutRouteImport } from './routes/_site.about'
 
@@ -53,6 +54,11 @@ const SitePackagesRoute = SitePackagesRouteImport.update({
   path: '/packages',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteLoginRoute = SiteLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteContactRoute = SiteContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/about': typeof SiteAboutRoute
   '/contact': typeof SiteContactRoute
+  '/login': typeof SiteLoginRoute
   '/packages': typeof SitePackagesRoute
   '/portfolio': typeof SitePortfolioRoute
   '/services': typeof SiteServicesRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/about': typeof SiteAboutRoute
   '/contact': typeof SiteContactRoute
+  '/login': typeof SiteLoginRoute
   '/packages': typeof SitePackagesRoute
   '/portfolio': typeof SitePortfolioRoute
   '/services': typeof SiteServicesRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/_site/about': typeof SiteAboutRoute
   '/_site/contact': typeof SiteContactRoute
+  '/_site/login': typeof SiteLoginRoute
   '/_site/packages': typeof SitePackagesRoute
   '/_site/portfolio': typeof SitePortfolioRoute
   '/_site/services': typeof SiteServicesRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/about'
     | '/contact'
+    | '/login'
     | '/packages'
     | '/portfolio'
     | '/services'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/about'
     | '/contact'
+    | '/login'
     | '/packages'
     | '/portfolio'
     | '/services'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/_site/about'
     | '/_site/contact'
+    | '/_site/login'
     | '/_site/packages'
     | '/_site/portfolio'
     | '/_site/services'
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitePackagesRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/login': {
+      id: '/_site/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof SiteLoginRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/contact': {
       id: '/_site/contact'
       path: '/contact'
@@ -206,6 +225,7 @@ declare module '@tanstack/react-router' {
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
   SiteContactRoute: typeof SiteContactRoute
+  SiteLoginRoute: typeof SiteLoginRoute
   SitePackagesRoute: typeof SitePackagesRoute
   SitePortfolioRoute: typeof SitePortfolioRoute
   SiteServicesRoute: typeof SiteServicesRoute
@@ -216,6 +236,7 @@ interface SiteRouteChildren {
 const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
   SiteContactRoute: SiteContactRoute,
+  SiteLoginRoute: SiteLoginRoute,
   SitePackagesRoute: SitePackagesRoute,
   SitePortfolioRoute: SitePortfolioRoute,
   SiteServicesRoute: SiteServicesRoute,

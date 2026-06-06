@@ -3,13 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB914Uh9sPwRTXo595nn19lggEyz9TdjFs",
-  authDomain: "aura-events-960dc.firebaseapp.com",
-  projectId: "aura-events-960dc",
-  storageBucket: "aura-events-960dc.firebasestorage.app",
-  messagingSenderId: "305714152084",
-  appId: "1:305714152084:web:5b62156915ef1f62cf6a81",
-  measurementId: "G-RB7PQVSCWW"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase (SSR Safe)
